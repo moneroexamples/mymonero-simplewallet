@@ -16,14 +16,19 @@ namespace xmreg
         positional_options_description p;
 
         options_description desc(
-                "mymonero, recover private and public keys "
-                "and address based on MyMonero mnemonic seed");
+                "mymonero-keys, generate simplewallet keys file "
+                "based on MyMonero's 13 world mnemonic seed");
 
         desc.add_options()
                 ("help,h", value<bool>()->default_value(false)->implicit_value(true),
                  "produce help message")
                 ("mnemonic,m", value<string>(),
-                 "13 word representation of the private view key from MyMonero");
+                 "13 word mnemonic seed from MyMonero")
+                ("wallet-file,w", value<string>(),
+                 "output wallet file, e.g. mmwallet.bin")
+                ("password,p", value<string>(),
+                 "wallet password");
+
 
         store(command_line_parser(acc, avv)
                           .options(desc)

@@ -72,6 +72,9 @@ namespace xmreg
     template <typename T>
     T get_key_from_hash(crypto::hash& in_hash);
 
+    std::string
+    get_home_folder();
+
 
 
 }

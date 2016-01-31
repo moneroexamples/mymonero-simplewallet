@@ -17,17 +17,6 @@ using xmreg::operator<<;
 unsigned int epee::g_test_dbg_lock_sleep = 0;
 
 
-
-//class simple_account: public cryptonote::account_base
-//{
-//    simple_account(): cryptonote::account_base() {};
-//    void create_from_keys(const crypto::secret_key& spend,
-//                          const crypto::secret_key& view)
-//    {
-//        m_keys;
-//    }
-//};
-
 int main(int ac, const char* av[]) {
 
     // get command line options
@@ -47,12 +36,27 @@ int main(int ac, const char* av[]) {
 
     // get 13 word mnemonic seed from MyMonero
     auto mnemonic_opt = opts.get_option<string>("mnemonic");
+    auto wallet_file_opt = opts.get_option<string>("wallet-file");
+    auto password_opt = opts.get_option<string>("password");
 
     // get the program command line options, or
     // some default values for quick check
     string mnemonic_str = mnemonic_opt
                           ? *mnemonic_opt
                           : "slid otherwise jeers lurk swung tawny zodiac tusks twang cajun swagger peaches tawny";
+
+
+    // simplewallet wallet file name, e.g., mmwallet.bin
+    // actually we do not directy create this file. we
+    // create a file *.keys containing the address and the private keys
+    string wallet_file = wallet_file_opt
+                         ? *wallet_file_opt
+                         : xmreg::get_home_folder() + string("mmwallet.bin");
+
+    // name of the keys files
+    string keys_file_name = wallet_file + string(".keys");
+
+    string password = password_opt ? *password_opt : "password";
 
     cout << "\n"
          << "Mnemonic seed    : " << mnemonic_str << endl;
@@ -127,11 +131,6 @@ int main(int ac, const char* av[]) {
     // that can be read by simplewallet
 
 
-
-    std::string password {"test"};
-
-    std::string keys_file_name {"/home/mwo/Desktop/w.dat.keys"};
-
     // we start this by creating instance of simple_account class
     // and populate with the address, and private spend and view keys
     // obtained in the previous steps
@@ -178,17 +177,32 @@ int main(int ac, const char* av[]) {
 
     std::string buf;
 
+    // serialize key file data
     if (!serialization::dump_binary(keys_file_data, buf))
     {
         cerr << "Something went wrong with serializing keys_file_data" << endl;
         return 1;
     }
 
+    // save serialized keys into the wallet file
     if (!epee::file_io_utils::save_string_to_file(keys_file_name, buf))
     {
         cerr << "Something went wrong with writing file: " << keys_file_name << endl;
         return 1;
     }
+
+    cout << "\nKeys file \"" << keys_file_name << "\" created." << endl;
+
+    cout << "\nStart simplewallet using: \n"
+         << "/opt/bitmonero/simplewallet --wallet-file " << keys_file_name
+         << endl;
+
+    cout << "\nPassord given is: \"" << password <<"\"" << endl;
+
+    cout << "\nUse 'refresh' command in the simplewallet "
+                    "to scan the blockchain "
+                    "for your transactions. "
+         << endl;
 
 
     cout << "\nEnd of program." << endl;

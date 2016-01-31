@@ -1,5 +1,5 @@
 //
-// Created by marcin on 31/01/16.
+// Created by mwo on 31/01/16.
 //
 
 #include "simple_account.h"

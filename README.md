@@ -5,8 +5,11 @@ cant be used in the Monero's `simplewallet`. The reason is, that the `simplewall
 uses 25 word mnemonic seed, and also, generation of private view and spend keys
 by the `simplewallet` is different than that used by [MyMonero](https://mymonero.com/).
 
-In this example, an attempt is made to generate a wallet file that can
- be used by `simplewallet`.
+Thus, at the moment you cant use your MyMonero account with simplewallet. This is
+a problem, because what if MyMonero is online? Or what if it is going to be shutdown?
+
+In this example, an attempt is made to generate a wallet file, based on
+MyMonero 13 mnemonic seed that can be used by `simplewallet`.
 
 More information on the differences between the `simplewallet` and MyMonero,
 can be found:

@@ -181,5 +181,26 @@ namespace xmreg
     template public_key get_key_from_hash<public_key>(crypto::hash& in_hash);
 
 
+    std::string
+    get_home_folder()
+    {
+
+        std::string config_folder;
+
+        std::string pathRet;
+
+        char* pszHome = getenv("HOME");
+        if (pszHome == NULL || strlen(pszHome) == 0)
+            pathRet = "/";
+        else
+            pathRet = pszHome;
+
+        config_folder = (pathRet + string("/"));
+
+
+        return config_folder;
+    }
+
+
 
 }
