@@ -273,6 +273,14 @@ The comparison of MyMonero website with the wallet generated is shown on the fol
 As can be seen on the screenshot, address, private view and spend keys, as well as balance of the
 `simplewallet` wallet generated agree with that of MyMonero website.
 
+Obviously, we can use `simplewallet` now to transfer founds normally available only
+through MyMonero, as demonstrated on the following screenshot:
+
+![After](https://raw.githubusercontent.com/moneroexamples/mymonero-simplewallet/master/img/example_01a.jpg)
+
+After sending out xmr from `simplewallet`, MyMonero after few minutes refreshes my account status
+correctly showing that the founds are being send out.
+
 ## How can you help?
 
 Constructive criticism, code and website edits are always good. They can be made through github.
