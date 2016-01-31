@@ -79,13 +79,13 @@ set(SOURCE_FILES
         main.cpp)
 
 # make executable called xmreg01
-add_executable(mymonero
+add_executable(mymonerowallet
         ${SOURCE_FILES})
 
 
 # link our exexutable xmreg01 against
 # libraries
-target_link_libraries(mymonero
+target_link_libraries(mymonerowallet
         myxrm
         cryptonote_core
         mnemonics

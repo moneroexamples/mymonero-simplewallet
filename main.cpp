@@ -2,6 +2,7 @@
 #include "src/CmdLineOptions.h"
 #include "src/tools.h"
 #include "src/electrum-words.h"
+#include "src/simple_account.h"
 
 #include <iostream>
 #include <string>
@@ -16,6 +17,16 @@ using xmreg::operator<<;
 unsigned int epee::g_test_dbg_lock_sleep = 0;
 
 
+
+//class simple_account: public cryptonote::account_base
+//{
+//    simple_account(): cryptonote::account_base() {};
+//    void create_from_keys(const crypto::secret_key& spend,
+//                          const crypto::secret_key& view)
+//    {
+//        m_keys;
+//    }
+//};
 
 int main(int ac, const char* av[]) {
 
@@ -109,6 +120,75 @@ int main(int ac, const char* av[]) {
 
     cout << "\n"
          << "Monero address   : " << address << endl;
+
+
+    // Once we have all keys and address from the mnemonic seed
+    // we can proceed to generating wallet *.keys file
+    // that can be read by simplewallet
+
+
+
+    std::string password {"test"};
+
+    std::string keys_file_name {"/home/mwo/Desktop/w.dat.keys"};
+
+    // we start this by creating instance of simple_account class
+    // and populate with the address, and private spend and view keys
+    // obtained in the previous steps
+    xmreg::simple_account account;
+
+    account.create_from_keys(address, private_spend_key, private_view_key);
+
+    std::string account_data;
+
+
+    if (!epee::serialization::store_t_to_binary(account, account_data))
+    {
+        cerr << "Something went wrong with serializing simple_account instance" << endl;
+        return 1;
+    }
+
+    rapidjson::Document json;
+    json.SetObject();
+    rapidjson::Value value(rapidjson::kStringType);
+
+
+    value.SetString(account_data.c_str(), account_data.length());
+
+    json.AddMember("key_data", value, json.GetAllocator());
+
+    tools::wallet2::keys_file_data keys_file_data
+            = boost::value_initialized<tools::wallet2::keys_file_data>();
+
+    // Serialize the JSON object
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    json.Accept(writer);
+    account_data = buffer.GetString();
+
+    // Encrypt the entire JSON object.
+    crypto::chacha8_key key;
+    crypto::generate_chacha8_key(password, key);
+    std::string cipher;
+    cipher.resize(account_data.size());
+    keys_file_data.iv = crypto::rand<crypto::chacha8_iv>();
+    crypto::chacha8(account_data.data(), account_data.size(),
+                    key, keys_file_data.iv, &cipher[0]);
+    keys_file_data.account_data = cipher;
+
+    std::string buf;
+
+    if (!serialization::dump_binary(keys_file_data, buf))
+    {
+        cerr << "Something went wrong with serializing keys_file_data" << endl;
+        return 1;
+    }
+
+    if (!epee::file_io_utils::save_string_to_file(keys_file_name, buf))
+    {
+        cerr << "Something went wrong with writing file: " << keys_file_name << endl;
+        return 1;
+    }
 
 
     cout << "\nEnd of program." << endl;

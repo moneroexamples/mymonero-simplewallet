@@ -12,7 +12,7 @@ set(SOURCE_FILES
 		MicroCore.cpp
 		tools.cpp
 		CmdLineOptions.cpp
-		electrum-words.cpp)
+		electrum-words.cpp simple_account.cpp simple_account.h)
 
 # make static library called libmyxrm
 # that we are going to link to
