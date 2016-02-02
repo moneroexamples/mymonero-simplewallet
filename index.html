@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Mymonero-simplewallet by moneroexamples</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Mymonero-simplewallet</h1>
+      <h2 class="project-tagline">Generate simplewallet based on MyMonero 13 word mnemonic seed</h2>
+      <a href="https://github.com/moneroexamples/mymonero-simplewallet" class="btn">View on GitHub</a>
+      <a href="https://github.com/moneroexamples/mymonero-simplewallet/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/moneroexamples/mymonero-simplewallet/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="generate-simplewallet-based-on-mymonero-13-word-mnemonic-seed" class="anchor" href="#generate-simplewallet-based-on-mymonero-13-word-mnemonic-seed" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Generate simplewallet based on MyMonero 13 word mnemonic seed</h1>
+
+<p><a href="https://mymonero.com/">MyMonero</a> uses 13 word mnemonic seed, which
+cant be used in the Monero's <code>simplewallet</code>. The reason is, that the <code>simplewallet</code>
+uses 25 word mnemonic seed, and also, generation of private view and spend keys
+by the <code>simplewallet</code> is different than that used by <a href="https://mymonero.com/">MyMonero</a>.</p>
+
+<p>Thus, at the moment you cant use your MyMonero account with simplewallet. This is
+a problem, because what if MyMonero is online? Or what if it is going to be shutdown?</p>
+
+<p>In this example, an attempt is made to generate a wallet file, based on
+MyMonero 13 mnemonic seed that can be used by <code>simplewallet</code>.</p>
+
+<p>More information on the differences between the <code>simplewallet</code> and MyMonero,
+can be found:</p>
+
+<ul>
+<li><a href="http://xmrtests.llcoins.net/addresstests.html">Cryptnote Tests</a></li>
+<li><a href="https://www.reddit.com/r/Monero/comments/3s80l2/why_mymonero_key_derivation_is_different_than_for/">Why MyMonero key derivation is different than for the simplewallet (Mnemonic)</a></li>
+</ul>
+
+<p>The example was prepared and tested on Xubuntu 15.10 x64 and Monero 0.9.</p>
+
+<p>Instruction for Monero 0.9 compilation and setup of Monero's header files and libraries are at:</p>
+
+<ul>
+<li><a href="https://github.com/moneroexamples/compile-monero-09-on-ubuntu">Compile Monero 0.9 on Ubuntu 15.10 and 14.04 x64</a></li>
+</ul>
+
+<p>English is assumed to be seed's language. Thus, if your seed is other language
+then English, the example probably will not work.</p>
+
+<h2>
+<a id="c-maincpp" class="anchor" href="#c-maincpp" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>C++: main.cpp</h2>
+
+<div class="highlight highlight-source-c++"><pre><span class="pl-k">int</span> <span class="pl-en">main</span>(<span class="pl-k">int</span> ac, <span class="pl-k">const</span> <span class="pl-k">char</span>* av[]) {
+
+    <span class="pl-c">// get command line options</span>
+    xmreg::CmdLineOptions opts {ac, av};
+
+    <span class="pl-k">auto</span> help_opt = opts.<span class="pl-smi">get_option</span>&lt;<span class="pl-k">bool</span>&gt;(<span class="pl-s"><span class="pl-pds">"</span>help<span class="pl-pds">"</span></span>);
+
+    <span class="pl-c">// if help was chosen, display help text and finish</span>
+    <span class="pl-k">if</span> (*help_opt)
+    {
+        <span class="pl-k">return</span> <span class="pl-c1">0</span>;
+    }
+
+    <span class="pl-c">// default language for the mnemonic</span>
+    <span class="pl-c">// representation of the private spend key</span>
+    string language {<span class="pl-s"><span class="pl-pds">"</span>English<span class="pl-pds">"</span></span>};
+
+    <span class="pl-c">// get 13 word mnemonic seed from MyMonero</span>
+    <span class="pl-k">auto</span> mnemonic_opt = opts.<span class="pl-smi">get_option</span>&lt;string&gt;(<span class="pl-s"><span class="pl-pds">"</span>mnemonic<span class="pl-pds">"</span></span>);
+    <span class="pl-k">auto</span> wallet_file_opt = opts.<span class="pl-smi">get_option</span>&lt;string&gt;(<span class="pl-s"><span class="pl-pds">"</span>wallet-file<span class="pl-pds">"</span></span>);
+    <span class="pl-k">auto</span> password_opt = opts.<span class="pl-smi">get_option</span>&lt;string&gt;(<span class="pl-s"><span class="pl-pds">"</span>password<span class="pl-pds">"</span></span>);
+
+    <span class="pl-c">// get the program command line options, or</span>
+    <span class="pl-c">// some default values for quick check</span>
+    string mnemonic_str = mnemonic_opt
+                          ? *mnemonic_opt
+                          : <span class="pl-s"><span class="pl-pds">"</span>slid otherwise jeers lurk swung tawny zodiac tusks twang cajun swagger peaches tawny<span class="pl-pds">"</span></span>;
+
+
+    <span class="pl-c">// simplewallet wallet file name, e.g., mmwallet.bin</span>
+    <span class="pl-c">// actually we do not directy create this file. we</span>
+    <span class="pl-c">// create a file *.keys containing the address and the private keys</span>
+    string wallet_file = wallet_file_opt
+                         ? *wallet_file_opt
+                         : <span class="pl-c1">xmreg::get_home_folder</span>() + <span class="pl-c1">string</span>(<span class="pl-s"><span class="pl-pds">"</span>mmwallet.bin<span class="pl-pds">"</span></span>);
+
+    <span class="pl-c">// name of the keys files</span>
+    string keys_file_name = wallet_file + <span class="pl-c1">string</span>(<span class="pl-s"><span class="pl-pds">"</span>.keys<span class="pl-pds">"</span></span>);
+
+    string password = password_opt ? *password_opt : <span class="pl-s"><span class="pl-pds">"</span>password<span class="pl-pds">"</span></span>;
+
+    cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>
+         &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Mnemonic seed    : <span class="pl-pds">"</span></span> &lt;&lt; mnemonic_str &lt;&lt; endl;
+
+
+    <span class="pl-c">// change the MyMonero 13 word mnemonic seed</span>
+    <span class="pl-c">// to its 16 byte hexadecimal version</span>
+    xmreg::secret_key16 hexadecimal_seed;
+
+    <span class="pl-c">// use modified words_to_bytes function.</span>
+    <span class="pl-c1">xmreg::ElectrumWords::words_to_bytes</span>(mnemonic_str, hexadecimal_seed, language);
+
+    cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>
+         &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Hexadecimal seed : <span class="pl-pds">"</span></span> &lt;&lt; hexadecimal_seed &lt;&lt; endl;
+
+
+    <span class="pl-c">// take the 16 byte hexadecimal_seed, and</span>
+    <span class="pl-c">// and perform Keccak hash on it. It will</span>
+    <span class="pl-c">// produce 32 byte hash.</span>
+    crypto::hash hash_of_seed;
+
+    <span class="pl-c1">cn_fast_hash</span>(hexadecimal_seed.<span class="pl-smi">data</span>, <span class="pl-k">sizeof</span>(hexadecimal_seed.<span class="pl-smi">data</span>), hash_of_seed);
+
+    cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>
+         &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Hash of seed     : <span class="pl-pds">"</span></span> &lt;&lt; hash_of_seed&lt;&lt; endl;
+
+
+    <span class="pl-c">// having the hashed seed, we can proceed</span>
+    <span class="pl-c">// with generation of private and public spend keys.</span>
+    <span class="pl-c">// the keccak hash of the seed is used as a seed</span>
+    <span class="pl-c">// to generate the spend keys.</span>
+    crypto::public_key public_spend_key;
+    crypto::secret_key private_spend_key;
+
+    <span class="pl-c1">crypto::generate_keys</span>(public_spend_key, private_spend_key,
+                          xmreg::get_key_from_hash&lt;crypto::secret_key&gt;(hash_of_seed),
+                          <span class="pl-c1">true</span>);
+
+    cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>
+         &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Private spend key: <span class="pl-pds">"</span></span> &lt;&lt; private_spend_key &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>
+         &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Public spend key : <span class="pl-pds">"</span></span> &lt;&lt; public_spend_key  &lt;&lt; endl;
+
+    <span class="pl-c">// now we get private and public view keys.</span>
+    <span class="pl-c">// to do this, we keccak hash the hash_of_seed again</span>
+    crypto::hash hash_of_hash;
+    <span class="pl-c1">cn_fast_hash</span>(hash_of_seed.<span class="pl-smi">data</span>, <span class="pl-k">sizeof</span>(hash_of_seed.<span class="pl-smi">data</span>), hash_of_hash);
+
+    crypto::public_key public_view_key;
+    crypto::secret_key private_view_key;
+
+
+    <span class="pl-c1">crypto::generate_keys</span>(public_view_key, private_view_key,
+                          xmreg::get_key_from_hash&lt;crypto::secret_key&gt;(hash_of_hash),
+                          <span class="pl-c1">true</span>);
+
+    cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>
+         &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Private view key : <span class="pl-pds">"</span></span> &lt;&lt; private_view_key &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>
+         &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Public view key  : <span class="pl-pds">"</span></span> &lt;&lt; public_view_key  &lt;&lt; endl;
+
+
+
+    <span class="pl-c">// having all keys, we can get the corresponding monero address</span>
+    cryptonote::account_public_address address {public_spend_key, public_view_key};
+
+
+    cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span><span class="pl-pds">"</span></span>
+         &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Monero address   : <span class="pl-pds">"</span></span> &lt;&lt; address &lt;&lt; endl;
+
+
+    <span class="pl-c">// Once we have all keys and address from the mnemonic seed</span>
+    <span class="pl-c">// we can proceed to generating wallet *.keys file</span>
+    <span class="pl-c">// that can be read by simplewallet</span>
+
+
+    <span class="pl-c">// we start this by creating instance of simple_account class</span>
+    <span class="pl-c">// and populate with the address, and private spend and view keys</span>
+    <span class="pl-c">// obtained in the previous steps</span>
+    xmreg::simple_account account;
+
+    account.<span class="pl-c1">create_from_keys</span>(address, private_spend_key, private_view_key);
+
+    std::string account_data;
+
+
+    <span class="pl-k">if</span> (!<span class="pl-c1">epee::serialization::store_t_to_binary</span>(account, account_data))
+    {
+        cerr &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Something went wrong with serializing simple_account instance<span class="pl-pds">"</span></span> &lt;&lt; endl;
+        <span class="pl-k">return</span> <span class="pl-c1">1</span>;
+    }
+
+    rapidjson::Document json;
+    json.<span class="pl-c1">SetObject</span>();
+    rapidjson::Value <span class="pl-smi">value</span>(rapidjson::<span class="pl-c1">kStringType</span>);
+
+
+    value.<span class="pl-c1">SetString</span>(account_data.<span class="pl-c1">c_str</span>(), account_data.<span class="pl-c1">length</span>());
+
+    json.<span class="pl-c1">AddMember</span>(<span class="pl-s"><span class="pl-pds">"</span>key_data<span class="pl-pds">"</span></span>, value, json.<span class="pl-c1">GetAllocator</span>());
+
+    tools::wallet2::keys_file_data keys_file_data
+            = boost::value_initialized&lt;tools::wallet2::keys_file_data&gt;();
+
+    <span class="pl-c">// Serialize the JSON object</span>
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer&lt;rapidjson::StringBuffer&gt; <span class="pl-c1">writer</span>(buffer);
+    json.<span class="pl-c1">Accept</span>(writer);
+    account_data = buffer.<span class="pl-c1">GetString</span>();
+
+    <span class="pl-c">// Encrypt the entire JSON object.</span>
+    crypto::chacha8_key key;
+    <span class="pl-c1">crypto::generate_chacha8_key</span>(password, key);
+    std::string cipher;
+    cipher.<span class="pl-c1">resize</span>(account_data.<span class="pl-c1">size</span>());
+    keys_file_data.<span class="pl-smi">iv</span> = crypto::<span class="pl-c1">rand</span>&lt;crypto::chacha8_iv&gt;();
+    <span class="pl-c1">crypto::chacha8</span>(account_data.<span class="pl-c1">data</span>(), account_data.<span class="pl-c1">size</span>(),
+                    key, keys_file_data.<span class="pl-smi">iv</span>, &amp;cipher[<span class="pl-c1">0</span>]);
+    keys_file_data.<span class="pl-smi">account_data</span> = cipher;
+
+    std::string buf;
+
+    <span class="pl-c">// serialize key file data</span>
+    <span class="pl-k">if</span> (!<span class="pl-c1">serialization::dump_binary</span>(keys_file_data, buf))
+    {
+        cerr &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Something went wrong with serializing keys_file_data<span class="pl-pds">"</span></span> &lt;&lt; endl;
+        <span class="pl-k">return</span> <span class="pl-c1">1</span>;
+    }
+
+    <span class="pl-c">// save serialized keys into the wallet file</span>
+    <span class="pl-k">if</span> (!<span class="pl-c1">epee::file_io_utils::save_string_to_file</span>(keys_file_name, buf))
+    {
+        cerr &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>Something went wrong with writing file: <span class="pl-pds">"</span></span> &lt;&lt; keys_file_name &lt;&lt; endl;
+        <span class="pl-k">return</span> <span class="pl-c1">1</span>;
+    }
+
+    cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span>Keys file <span class="pl-cce">\"</span><span class="pl-pds">"</span></span> &lt;&lt; keys_file_name &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\"</span> created.<span class="pl-pds">"</span></span> &lt;&lt; endl;
+
+    cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span>Start simplewallet using: <span class="pl-cce">\n</span><span class="pl-pds">"</span></span>
+         &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span>/opt/bitmonero/simplewallet --wallet-file <span class="pl-pds">"</span></span> &lt;&lt; wallet_file
+         &lt;&lt; endl;
+
+    cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span>Passord given is: <span class="pl-cce">\"</span><span class="pl-pds">"</span></span> &lt;&lt; password &lt;&lt;<span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\"</span><span class="pl-pds">"</span></span> &lt;&lt; endl;
+
+    cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span>Use 'refresh' command in the simplewallet <span class="pl-pds">"</span></span>
+                    <span class="pl-s"><span class="pl-pds">"</span>to scan the blockchain <span class="pl-pds">"</span></span>
+                    <span class="pl-s"><span class="pl-pds">"</span>for your transactions. <span class="pl-pds">"</span></span>
+         &lt;&lt; endl;
+
+
+    cout &lt;&lt; <span class="pl-s"><span class="pl-pds">"</span><span class="pl-cce">\n</span>End of program.<span class="pl-pds">"</span></span> &lt;&lt; endl;
+
+    <span class="pl-k">return</span> <span class="pl-c1">0</span>;
+}</pre></div>
+
+<h2>
+<a id="program-options" class="anchor" href="#program-options" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Program options</h2>
+
+<div class="highlight highlight-source-shell"><pre>./mymonerowallet -h
+mymonero-keys, generate simplewallet keys file based on MyMonero<span class="pl-s"><span class="pl-pds">'</span>s 13 world mnemonic seed:</span>
+<span class="pl-s">  -h [ --help ] [=arg(=1)] (=0) produce help message</span>
+<span class="pl-s">  -m [ --mnemonic ] arg         13 word mnemonic seed from MyMonero</span>
+<span class="pl-s">  -w [ --wallet-file ] arg      output wallet file, e.g. mmwallet.bin</span>
+<span class="pl-s">  -p [ --password ] arg         wallet password</span></pre></div>
+
+<h2>
+<a id="example-1" class="anchor" href="#example-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Example 1</h2>
+
+<p>Execute <code>mymonerowallet</code> with default options</p>
+
+<div class="highlight highlight-source-shell"><pre>./mymonerowallet</pre></div>
+
+<p>Output:</p>
+
+<div class="highlight highlight-source-shell"><pre>Mnemonic seed    <span class="pl-c1">:</span> slid otherwise jeers lurk swung tawny zodiac tusks twang cajun swagger peaches tawny
+
+Hexadecimal seed <span class="pl-c1">:</span> <span class="pl-k">&lt;</span>5878efd0a6d45b0374b49c000da07cd<span class="pl-k">2&gt;</span>
+
+Hash of seed     <span class="pl-c1">:</span> <span class="pl-k">&lt;</span>6d23fe14606a0d5fe62d05a78c4b5b1cae2f38f9330e42e86a50286db16ad61e<span class="pl-k">&gt;</span>
+
+Private spend key: <span class="pl-k">&lt;</span>804f08b84507fb0610910d04ae517c07ae2f38f9330e42e86a50286db16ad60e<span class="pl-k">&gt;</span>
+Public spend key <span class="pl-c1">:</span> <span class="pl-k">&lt;</span>b54264728412c71bb62caca5b3cb57eb96a48a580c97a65257290243e3adf<span class="pl-k">401&gt;</span>
+
+Private view key <span class="pl-c1">:</span> <span class="pl-k">&lt;</span>dbb024c981cf7dc797593713f5f426c3b1cad50542c0814d4786e12e768be<span class="pl-k">504&gt;</span>
+Public view key  <span class="pl-c1">:</span> <span class="pl-k">&lt;</span>75fc0c90732a3db632bc0a169328067fa3f4c52e80ae067aa60bae8c4ccd<span class="pl-k">8711&gt;</span>
+
+Monero address   <span class="pl-c1">:</span> <span class="pl-k">&lt;</span>48VWHdLTEpE5dqa5VpAy5xgQWBHZARiGmEmojNLqD4ef1FAzkPxCe9JXUYwCShRR5XNMGnyusrnkmMWr2HMdfDRx2vsrG7c<span class="pl-k">&gt;</span>
+
+Keys file <span class="pl-s"><span class="pl-pds">"</span>/home/mwo/mmwallet.bin.keys<span class="pl-pds">"</span></span> created.
+
+Start simplewallet using:
+/opt/bitmonero/simplewallet --wallet-file /home/marcin/mmwallet.bin.keys
+
+Passord given is: <span class="pl-s"><span class="pl-pds">"</span>password<span class="pl-pds">"</span></span>
+
+Use <span class="pl-s"><span class="pl-pds">'</span>refresh<span class="pl-pds">'</span></span> <span class="pl-c1">command</span> <span class="pl-k">in</span> the simplewallet to scan the blockchain <span class="pl-k">for</span> your transactions.</pre></div>
+
+<p>The comparison of MyMonero website with the wallet generated is shown on the following screenshot:</p>
+
+<p><img src="https://raw.githubusercontent.com/moneroexamples/mymonero-simplewallet/master/img/example_01.jpg" alt="After"></p>
+
+<p>As can be seen on the screenshot, address, private view and spend keys, as well as balance of the
+<code>simplewallet</code> wallet generated agree with that of MyMonero website.</p>
+
+<p>Obviously, we can use <code>simplewallet</code> now to transfer founds normally available only
+through MyMonero, as demonstrated on the following screenshot:</p>
+
+<p><img src="https://raw.githubusercontent.com/moneroexamples/mymonero-simplewallet/master/img/example_01a.jpg" alt="After"></p>
+
+<p>After sending out xmr from <code>simplewallet</code>, MyMonero after few minutes refreshes my account status
+correctly showing that the founds are being send out.</p>
+
+<h2>
+<a id="example-2" class="anchor" href="#example-2" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Example 2</h2>
+
+<p>Execute <code>mymonerowallet</code> with MyMonero seed</p>
+
+<div class="highlight highlight-source-shell"><pre>./mymonerowallet -m <span class="pl-s"><span class="pl-pds">"</span>drying venomous baffles unusual northern cobra mobile unnoticed hedgehog oncoming neon gyrate unusual<span class="pl-pds">"</span></span> -w <span class="pl-k">~</span>/mmwallet2.dat -p somepassword12</pre></div>
+
+<p>Output:</p>
+
+<div class="highlight highlight-source-shell"><pre>Mnemonic seed    <span class="pl-c1">:</span> drying venomous baffles unusual northern cobra mobile unnoticed hedgehog oncoming neon gyrate unusual
+
+Hexadecimal seed <span class="pl-c1">:</span> <span class="pl-k">&lt;</span>4fd72328c8cc9b9327cac47896eec0cb<span class="pl-k">&gt;</span>
+
+Hash of seed     <span class="pl-c1">:</span> <span class="pl-k">&lt;</span>ae114efe5eea0c72d95b8cb2f366d2b3d51a9a0edb6d5d91801b06f2cff68c<span class="pl-k">70&gt;</span>
+
+Private spend key: <span class="pl-k">&lt;</span>33469573a6348c09fd11c73ddd91b921d51a9a0edb6d5d91801b06f2cff68c<span class="pl-k">00&gt;</span>
+Public spend key <span class="pl-c1">:</span> <span class="pl-k">&lt;</span>0ccebf6b53e9acb923da7a9f7c81633d49e562fb726fa480ead525967aa<span class="pl-k">70088&gt;</span>
+
+Private view key <span class="pl-c1">:</span> <span class="pl-k">&lt;</span>4baa54bdac1ec957982899b197c1810b279eccab4243d46b889c7c274570c<span class="pl-k">606&gt;</span>
+Public view key  <span class="pl-c1">:</span> <span class="pl-k">&lt;</span>b4fd6af8d1515e81bf32b4dd6bda99f6702473514d7e690dde7a5bb8fa312a<span class="pl-k">42&gt;</span>
+
+Monero address   <span class="pl-c1">:</span> <span class="pl-k">&lt;</span>427FyKsPfaBXy6FByZLujQBFaT9zU1JXdNZfFNA3i6bqPsEHajfcKRFNhi1ptUEyLLiDkxPq2KQwJ3KYjnhYseuo8W9d5in<span class="pl-k">&gt;</span>
+
+Keys file <span class="pl-s"><span class="pl-pds">"</span>/home/marcin/mmwallet2.dat.keys<span class="pl-pds">"</span></span> created.
+
+Start simplewallet using:
+/opt/bitmonero/simplewallet --wallet-file /home/mwo/mmwallet2.dat</pre></div>
+
+<p>The comparison of MyMonero website with the wallet generated is shown on the following screenshot (only address and private keys shown):</p>
+
+<p><img src="https://raw.githubusercontent.com/moneroexamples/mymonero-simplewallet/master/img/example_02.jpg" alt="After"></p>
+
+<h2>
+<a id="how-can-you-help" class="anchor" href="#how-can-you-help" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How can you help?</h2>
+
+<p>Constructive criticism, code and website edits are always good. They can be made through github.</p>
+
+<p>Some Monero are also welcome:</p>
+
+<pre><code>48daf1rG3hE1Txapcsxh6WXNe9MLNKtu7W7tKTivtSoVLHErYzvdcpea2nSTgGkz66RFP4GKVAsTV14v6G3oddBTHfxP6tU
+</code></pre>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/moneroexamples/mymonero-simplewallet">Mymonero-simplewallet</a> is maintained by <a href="https://github.com/moneroexamples">moneroexamples</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
