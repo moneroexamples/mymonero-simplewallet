@@ -239,7 +239,7 @@ Execute `mymonerowallet` with default options
 ./mymonerowallet
 ```
 
-Output
+Output:
 
 ```bash
 Mnemonic seed    : slid otherwise jeers lurk swung tawny zodiac tusks twang cajun swagger peaches tawny
@@ -280,6 +280,41 @@ through MyMonero, as demonstrated on the following screenshot:
 
 After sending out xmr from `simplewallet`, MyMonero after few minutes refreshes my account status
 correctly showing that the founds are being send out.
+
+## Example 2
+
+Execute `mymonerowallet` with MyMonero seed
+
+```bash
+./mymonerowallet -m "drying venomous baffles unusual northern cobra mobile unnoticed hedgehog oncoming neon gyrate unusual" -w ~/mmwallet2.dat -p somepassword12
+```
+
+Output:
+
+```bash
+Mnemonic seed    : drying venomous baffles unusual northern cobra mobile unnoticed hedgehog oncoming neon gyrate unusual
+
+Hexadecimal seed : <4fd72328c8cc9b9327cac47896eec0cb>
+
+Hash of seed     : <ae114efe5eea0c72d95b8cb2f366d2b3d51a9a0edb6d5d91801b06f2cff68c70>
+
+Private spend key: <33469573a6348c09fd11c73ddd91b921d51a9a0edb6d5d91801b06f2cff68c00>
+Public spend key : <0ccebf6b53e9acb923da7a9f7c81633d49e562fb726fa480ead525967aa70088>
+
+Private view key : <4baa54bdac1ec957982899b197c1810b279eccab4243d46b889c7c274570c606>
+Public view key  : <b4fd6af8d1515e81bf32b4dd6bda99f6702473514d7e690dde7a5bb8fa312a42>
+
+Monero address   : <427FyKsPfaBXy6FByZLujQBFaT9zU1JXdNZfFNA3i6bqPsEHajfcKRFNhi1ptUEyLLiDkxPq2KQwJ3KYjnhYseuo8W9d5in>
+
+Keys file "/home/marcin/mmwallet2.dat.keys" created.
+
+Start simplewallet using:
+/opt/bitmonero/simplewallet --wallet-file /home/marcin/mmwallet2.dat
+```
+
+The comparison of MyMonero website with the wallet generated is shown on the following screenshot (only address and private keys shown):
+
+![After](https://raw.githubusercontent.com/moneroexamples/mymonero-simplewallet/master/img/example_02.jpg)
 
 ## How can you help?
 
