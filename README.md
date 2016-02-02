@@ -309,7 +309,7 @@ Monero address   : <427FyKsPfaBXy6FByZLujQBFaT9zU1JXdNZfFNA3i6bqPsEHajfcKRFNhi1p
 Keys file "/home/marcin/mmwallet2.dat.keys" created.
 
 Start simplewallet using:
-/opt/bitmonero/simplewallet --wallet-file /home/marcin/mmwallet2.dat
+/opt/bitmonero/simplewallet --wallet-file /home/mwo/mmwallet2.dat
 ```
 
 The comparison of MyMonero website with the wallet generated is shown on the following screenshot (only address and private keys shown):
