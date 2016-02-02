@@ -22,6 +22,8 @@ The example was prepared and tested on Xubuntu 15.10 x64 and Monero 0.9.
 Instruction for Monero 0.9 compilation and setup of Monero's header files and libraries are at:
  - [Compile Monero 0.9 on Ubuntu 15.10 and 14.04 x64](https://github.com/moneroexamples/compile-monero-09-on-ubuntu)
 
+English is assumed to be seed's language. Thus, if your seed is other language
+then English, the example probably will not work.
 
 ## C++: main.cpp
 
@@ -203,7 +205,7 @@ int main(int ac, const char* av[]) {
     cout << "\nKeys file \"" << keys_file_name << "\" created." << endl;
 
     cout << "\nStart simplewallet using: \n"
-         << "/opt/bitmonero/simplewallet --wallet-file " << keys_file_name
+         << "/opt/bitmonero/simplewallet --wallet-file " << wallet_file
          << endl;
 
     cout << "\nPassord given is: \"" << password <<"\"" << endl;
