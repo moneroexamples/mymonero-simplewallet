@@ -49,6 +49,9 @@ int main(int ac, const char* av[]) {
     // simplewallet wallet file name, e.g., mmwallet.bin
     // actually we do not directy create this file. we
     // create a file *.keys containing the address and the private keys
+    // the wallet file is going to be created by simplewallet after
+    // refresh to preserve the state of the wallet.
+    // we only need keys files to create the wallet.
     string wallet_file = wallet_file_opt
                          ? *wallet_file_opt
                          : xmreg::get_home_folder() + string("mmwallet.bin");
