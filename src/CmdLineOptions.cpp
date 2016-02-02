@@ -17,7 +17,7 @@ namespace xmreg
 
         options_description desc(
                 "mymonero-keys, generate simplewallet keys file "
-                "based on MyMonero's 13 world mnemonic seed");
+                "based on 13 world mnemonic seed from MyMonero website");
 
         desc.add_options()
                 ("help,h", value<bool>()->default_value(false)->implicit_value(true),
