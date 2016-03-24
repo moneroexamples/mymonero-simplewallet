@@ -23,7 +23,8 @@ Instruction for Monero 0.9 compilation and setup of Monero's header files and li
  - [Compile Monero 0.9 on Ubuntu 15.10 and 14.04 x64](https://github.com/moneroexamples/compile-monero-09-on-ubuntu)
 
 English is assumed to be seed's language. Thus, if your seed is other language
-then English, the example probably will not work.
+then English, the example probably will not work. I don't know. Havenit checked
+any other languages except English.
 
 ## C++: main.cpp
 
@@ -317,6 +318,34 @@ Start simplewallet using:
 The comparison of MyMonero website with the wallet generated is shown on the following screenshot (only address and private keys shown):
 
 ![After](https://raw.githubusercontent.com/moneroexamples/mymonero-simplewallet/master/img/example_02.jpg)
+
+
+## Compile this example
+The dependencies are same as those for Monero, so I assume Monero compiles
+correctly.
+
+Monero C++ headers and libraries are set as shown here:
+ - [Compile Monero 0.9 on Ubuntu 15.10 and 14.04 x64](https://github.com/moneroexamples/compile-monero-09-on-ubuntu)
+
+If so then to download and compile this example, the following
+steps can be executed:
+
+```bash
+# download the source code
+git clone https://github.com/moneroexamples/mymonero-simplewallet.git
+
+# enter the downloaded sourced code folder
+cd mymonero-simplewallet
+
+# create the makefile
+cmake .
+
+# compile
+make
+```
+
+After this, `mymonerowallet` executable file should be present in the mymonero-simplewallet
+folder.
 
 ## How can you help?
 
