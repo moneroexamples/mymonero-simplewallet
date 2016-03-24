@@ -262,7 +262,7 @@ Monero address   : <48VWHdLTEpE5dqa5VpAy5xgQWBHZARiGmEmojNLqD4ef1FAzkPxCe9JXUYwC
 Keys file "/home/mwo/mmwallet.bin.keys" created.
 
 Start simplewallet using:
-/opt/bitmonero/simplewallet --wallet-file /home/marcin/mmwallet.bin.keys
+/opt/bitmonero/simplewallet --wallet-file /home/mwo/mmwallet.bin.keys
 
 Passord given is: "password"
 
@@ -309,7 +309,7 @@ Public view key  : <b4fd6af8d1515e81bf32b4dd6bda99f6702473514d7e690dde7a5bb8fa31
 
 Monero address   : <427FyKsPfaBXy6FByZLujQBFaT9zU1JXdNZfFNA3i6bqPsEHajfcKRFNhi1ptUEyLLiDkxPq2KQwJ3KYjnhYseuo8W9d5in>
 
-Keys file "/home/marcin/mmwallet2.dat.keys" created.
+Keys file "/home/mwo/mmwallet2.dat.keys" created.
 
 Start simplewallet using:
 /opt/bitmonero/simplewallet --wallet-file /home/mwo/mmwallet2.dat
