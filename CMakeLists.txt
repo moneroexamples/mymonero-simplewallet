@@ -22,11 +22,11 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 # set location of monero static libraries
 set(MONERO_LIBS_DIR
-        /opt/bitmonero-dev/libs)
+        /opt/monero-dev/libs)
 
 # set location of moneroheaders
 set(MONERO_HEADERS_DIR
-        /opt/bitmonero-dev/headers)
+        /opt/monero-dev/headers)
 
 # include monero headers
 include_directories(
@@ -52,11 +52,13 @@ add_library(crypto STATIC IMPORTED)
 set_property(TARGET crypto
         PROPERTY IMPORTED_LOCATION ${MONERO_LIBS_DIR}/libcrypto.a)
 
+add_library(ringct STATIC IMPORTED)
+set_property(TARGET ringct
+        PROPERTY IMPORTED_LOCATION ${MONERO_LIBS_DIR}/libringct.a)
 
 add_library(cryptonote_core STATIC IMPORTED)
 set_property(TARGET cryptonote_core
         PROPERTY IMPORTED_LOCATION ${MONERO_LIBS_DIR}/libcryptonote_core.a)
-
 
 add_library(blockchain_db STATIC IMPORTED)
 set_property(TARGET blockchain_db
@@ -88,6 +90,7 @@ add_executable(mymonerowallet
 target_link_libraries(mymonerowallet
         myxrm
         cryptonote_core
+        ringct
         mnemonics
         blockchain_db
         crypto
