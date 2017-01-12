@@ -1,26 +1,26 @@
-# Generate simplewallet based on MyMonero 13 word mnemonic seed
+# Generate monero-wallet-cli based on MyMonero 13 word mnemonic seed
 
 [MyMonero](https://mymonero.com/) uses 13 word mnemonic seed, which
-cant be used in the Monero's `simplewallet`. The reason is, that the `simplewallet`
+cant be used in the Monero's `monero-wallet-cli`. The reason is, that the `monero-wallet-cli`
 uses 25 word mnemonic seed, and also, generation of private view and spend keys
-by the `simplewallet` is different than that used by [MyMonero](https://mymonero.com/).
+by the `monero-wallet-cli` is different than that used by [MyMonero](https://mymonero.com/).
 
-Thus, at the moment you cant use your MyMonero account with `simplewallet`. This is
+Thus, at the moment you cant use your MyMonero account with `monero-wallet-cli`. This is
 a problem, because what if MyMonero is offline? Or what if it is going to be shutdown?
 
 In this example, an attempt is made to generate a wallet file, based on
-MyMonero 13 mnemonic seed that can be used by `simplewallet`.
+MyMonero 13 mnemonic seed that can be used by `monero-wallet-cli`.
 
-More information on the differences between the `simplewallet` and MyMonero,
+More information on the differences between the `monero-wallet-cli` and MyMonero,
 can be found:
 
   - [Cryptnote Tests](http://xmrtests.llcoins.net/addresstests.html)
   - [Why MyMonero key derivation is different than for the simplewallet (Mnemonic)](https://www.reddit.com/r/Monero/comments/3s80l2/why_mymonero_key_derivation_is_different_than_for/)
 
-The example was prepared and tested on Xubuntu 15.10 x64 and Monero 0.9.
+The example was prepared and tested on Xubuntu 16.04 x64 and Monero 0.10.1.
 
-Instruction for Monero 0.9 compilation and setup of Monero's header files and libraries are at:
- - [Compile Monero 0.9 on Ubuntu 15.10 and 14.04 x64](https://github.com/moneroexamples/compile-monero-09-on-ubuntu)
+Instruction for Monero 0.10.1 compilation and setup of Monero's header files and libraries are at:
+ - [https://github.com/moneroexamples/compile-monero-09-on-ubuntu-16-04](https://github.com/moneroexamples/compile-monero-09-on-ubuntu-16-04)
 
 English is assumed to be seed's language. Thus, if your seed is other language
 then English, the example probably will not work. I don't know. Havenit checked
@@ -325,7 +325,7 @@ The dependencies are same as those for Monero, so I assume Monero compiles
 correctly.
 
 Monero C++ headers and libraries are set as shown here:
- - [Compile Monero 0.9 on Ubuntu 15.10 and 14.04 x64](https://github.com/moneroexamples/compile-monero-09-on-ubuntu)
+ - [compile-monero-09-on-ubuntu-16-04](https://github.com/moneroexamples/compile-monero-09-on-ubuntu-16-04)
 
 If so then to download and compile this example, the following
 steps can be executed:

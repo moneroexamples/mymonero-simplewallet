@@ -16,7 +16,7 @@ namespace xmreg
         positional_options_description p;
 
         options_description desc(
-                "mymonero-keys, generate simplewallet keys file "
+                "mymonero-keys, generate monero-wallet-cli keys file "
                 "based on 13 world mnemonic seed from MyMonero website");
 
         desc.add_options()

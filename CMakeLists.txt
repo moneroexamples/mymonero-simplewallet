@@ -43,34 +43,40 @@ include_directories(
 add_library(common STATIC IMPORTED)
 set_property(TARGET common PROPERTY IMPORTED_LOCATION ${MONERO_LIBS_DIR}/libcommon.a)
 
-
 add_library(blocks STATIC IMPORTED)
 set_property(TARGET blocks PROPERTY IMPORTED_LOCATION ${MONERO_LIBS_DIR}/libblocks.a)
 
-
-add_library(crypto STATIC IMPORTED)
-set_property(TARGET crypto
+add_library(cryptoxmr STATIC IMPORTED)
+set_property(TARGET cryptoxmr
         PROPERTY IMPORTED_LOCATION ${MONERO_LIBS_DIR}/libcrypto.a)
-
-add_library(ringct STATIC IMPORTED)
-set_property(TARGET ringct
-        PROPERTY IMPORTED_LOCATION ${MONERO_LIBS_DIR}/libringct.a)
 
 add_library(cryptonote_core STATIC IMPORTED)
 set_property(TARGET cryptonote_core
         PROPERTY IMPORTED_LOCATION ${MONERO_LIBS_DIR}/libcryptonote_core.a)
 
-add_library(blockchain_db STATIC IMPORTED)
-set_property(TARGET blockchain_db
-        PROPERTY IMPORTED_LOCATION ${MONERO_LIBS_DIR}/libblockchain_db.a)
+add_library(cryptonote_protocol STATIC IMPORTED)
+set_property(TARGET cryptonote_protocol
+        PROPERTY IMPORTED_LOCATION ${MONERO_LIBS_DIR}/libcryptonote_protocol.a)
 
 add_library(mnemonics STATIC IMPORTED)
 set_property(TARGET mnemonics
         PROPERTY IMPORTED_LOCATION ${MONERO_LIBS_DIR}/libmnemonics.a)
 
+add_library(blockchain_db STATIC IMPORTED)
+set_property(TARGET blockchain_db
+        PROPERTY IMPORTED_LOCATION ${MONERO_LIBS_DIR}/libblockchain_db.a)
+
 add_library(lmdb STATIC IMPORTED)
 set_property(TARGET lmdb
         PROPERTY IMPORTED_LOCATION ${MONERO_LIBS_DIR}/liblmdb.a)
+
+add_library(ringct STATIC IMPORTED)
+set_property(TARGET ringct
+        PROPERTY IMPORTED_LOCATION ${MONERO_LIBS_DIR}/libringct.a)
+
+add_library(wallet STATIC IMPORTED)
+set_property(TARGET wallet
+        PROPERTY IMPORTED_LOCATION ${MONERO_LIBS_DIR}/libwallet.a)
 
 # add src/ subfolder
 add_subdirectory(src/)
@@ -89,14 +95,22 @@ add_executable(mymonerowallet
 # libraries
 target_link_libraries(mymonerowallet
         myxrm
+        wallet
         cryptonote_core
-        ringct
-        mnemonics
+        cryptonote_protocol
         blockchain_db
-        crypto
+        cryptoxmr
         blocks
-        common
         lmdb
+        ringct
+        common
+        mnemonics
+        mysqlpp
+        mysqlclient
         ${Boost_LIBRARIES}
         pthread
-        unbound)
+        unbound
+        unwind
+        curl
+        dl
+        crypto)

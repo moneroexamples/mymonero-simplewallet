@@ -199,13 +199,13 @@ int main(int ac, const char* av[]) {
 
     cout << "\nKeys file \"" << keys_file_name << "\" created." << endl;
 
-    cout << "\nStart simplewallet using: \n"
-         << "/opt/bitmonero/simplewallet --wallet-file " << wallet_file
+    cout << "\nStart monero-wallet-cli using: \n"
+         << "/opt/monero/monero-wallet-cli --wallet-file " << wallet_file
          << endl;
 
     cout << "\nPassord given is: \"" << password <<"\"" << endl;
 
-    cout << "\nUse 'refresh' command in the simplewallet "
+    cout << "\nUse 'refresh' command in the monero-wallet-cli "
                     "to scan the blockchain "
                     "for your transactions. "
          << endl;
