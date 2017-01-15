@@ -105,12 +105,9 @@ target_link_libraries(mymonerowallet
         ringct
         common
         mnemonics
-        mysqlpp
-        mysqlclient
         ${Boost_LIBRARIES}
         pthread
         unbound
         unwind
-        curl
         dl
         crypto)
